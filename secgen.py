@@ -75,7 +75,6 @@ def parse(warn=0):
             print 'Have downloaded a proxy error...'
         return []
     soup = BeautifulSoup(d, smartQuotesTo=None)
-    #table = soup('body')[1].find('table')
     table = soup.find('div', id='content')
     events = []
     pastnoon = False
@@ -86,53 +85,8 @@ def parse(warn=0):
         if not m: continue
         time = m.group(1)
         text = row.replace(time, '')
-
-        #cells = row('td')
-        #time = parsecell(cells[0])
-        #if not time and len(cells)<3:
-        #    continue
-        #last = None
-        #if len(cells)==3 and not time:
-        #    last = parsecell(cells[2])
-        #elif len(cells)==2:
-        #    if not parsecell(cells[1]): # Two cell column, second empty, can't be time/event
-        #        last = time
-        #elif len(cells)==1:
-        #    last = time
-        #if last:
-            #last = re.sub('\xc2\xa0', ' ', last)
-        #    last = re.sub('APPOINTMENTS OF THE SECRETARY-GENERAL', '', last)
-        #    last = re.sub('\[?All (other )?appointments are internal\.?\]?(?i)', '', last)
-        #    last = re.sub('\(scroll down for Appointments.*', '', last)
-        #    last = re.sub(' \(Subject to change\)| *Subject to Change| Please note that this schedule is subject to change|( |\*)?REV\.? ?[12]\*?(?i)', '', last)
-            #last = re.sub('\s+$', '', last)
-            #last = re.sub('^\s+', '', last)
-        #    if re.search('Back to Spokes|on an official trip|on official travel|is travelling$|will be visiting|on official visit(?i)', last):
-        #        last = ''
-            #if last == '':
-            #    continue
-            #date = last
-            #try:
-            #    date = strptime(date, '%A, %d %B %Y')
-            #except:
-            #    try:
-            #        date = strptime(date, '%d %B %Y')
-            #    except:
-            #        try:
-            #            date = strptime(date, '%A %d %B %Y')
-            #        except:
-            #            if warn:
-            #                print "AARGH - *%s*" % date
-            #            sys.exit() # Bomb out if we can't get a date
-            #continue
-        #if time == '' or time == '.':
-        #    continue
         time, pastnoon = parsetime(time, date, pastnoon)
         event = parsecell(text, True)
-        #if len(cells)==2:
-        #    event = parsecell(cells[1], True)
-        #else:
-        #    event = parsecell(cells[2], True)
         event = prettify(event)
         events.append((time, event))
     return events
@@ -233,7 +187,6 @@ def prettify(s):
     return s
 
 def parsecell(s, d=False):
-    #s = s.renderContents()
     s = re.sub('\xc2\xa0', ' ', s)
     if d:
         s = re.sub("<br />", ", ", s)
