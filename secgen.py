@@ -20,7 +20,7 @@ from config import *
 
 localfile = '/guest/matthew/data/secgen-schedule'
 
-REGEX_TIME = re.compile('((\d+)(?:(?::|\.)\s*(\d+))?(?:\s+(a\.?m\.?|p\.?m\.?|noon))?)')
+REGEX_TIME = re.compile('((\d+)(?:(?::|\.)\s*(\d+)|\s+(a\.?m\.?|p\.?m\.?|noon))+)')
 
 def main():
     p = argparse.ArgumentParser(description="UN Secretary-General > Twitter v1.0")
