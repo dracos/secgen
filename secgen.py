@@ -82,7 +82,12 @@ def parse(warn=0):
     for row in table('tr'):
         row = parsecell(row.renderContents().decode('utf-8'))
         m = REGEX_TIME.match(row)
-        if not m: continue
+        if not m:
+            if row[0:2] == '- ':
+                event = parsecell(row, True)
+                last = events[-1]
+                events[-1] = ( last[0], '%s %s' % (last[1], event) )
+            continue
         time = m.group(1)
         text = row.replace(time, '')
         time, pastnoon = parsetime(time, date, pastnoon)
