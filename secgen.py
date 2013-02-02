@@ -20,7 +20,7 @@ from config import *
 
 localfile = '/guest/matthew/data/secgen-schedule'
 
-REGEX_TIME = re.compile('((\d+)(?:(?::|\.)\s*(\d+)|\s+(a\.?m\.?|p\.?m\.?|noon))+)')
+REGEX_TIME = re.compile('((\d+)(?:(?::|\.)\s*(\d+)|\s+(a\.?m\.?|p\.?m\.?|noon))+\.?)')
 
 def main():
     p = argparse.ArgumentParser(description="UN Secretary-General > Twitter v1.0")
@@ -70,7 +70,7 @@ def parse(warn=0):
         d = get_contents("%s-override" % localfile)
     except:
         d = get_contents(localfile)
-    if re.search('Proxy Error', d):
+    if re.search('Proxy Error', d) or re.search('website is undergoing urgent maintenance', d):
         if warn:
             print 'Have downloaded a proxy error...'
         return []
@@ -138,7 +138,7 @@ def parsetime(time, date, pastnoon):
     return d, pastnoon
 
 def prettify(s):
-    if re.match('Addressing|Meeting (with|on)|Visiting|Visit to|Press Conference', s):
+    if re.match('Addressing|Meeting (with|on)|Visiting|Visit to|Trilateral Meeting', s):
         return s
     if re.match('Joint press encounter by the Secretary-General with: ', s):
         return re.sub('Joint press encounter by the Secretary-General with: ', 'Joint press encounter with ', s)
@@ -166,19 +166,19 @@ def prettify(s):
         return re.sub('Secretary-General to deliver ', 'Delivering ', s)
     if re.match('Remarks by the Secretary-General |SG remarks at|Secretary-General (to give )?remarks at', s):
         return re.sub('Remarks by the Secretary-General |SG remarks |Secretary-General (to give )?remarks ', 'Making remarks ', s)
-    if re.search(' (?:.\200\223 |- |\[|\()Secretary-General to make remarks(\]|\))?$', s):
-        return re.sub('^(.*) (?:.\200\223 |- |\[|\()Secretary-General to make remarks(\]|\))?', r'Making remarks at the \1', s)
+    if re.search(' (?:.\200\223 |- |\[|\()Secretary-General (?:to|will) make remarks(\]|\))?$', s):
+        return re.sub('^(.*) (?:.\200\223 |- |\[|\()Secretary-General (?:to|will) make remarks(\]|\))?', r'Making remarks at the \1', s)
     if re.match('\[Remarks at\] ', s):
         return re.sub('\[Remarks at\] ', 'Making remarks at ', s)
     if re.search('Presentation of credential(?i)', s) or re.match('Remarks at', s) or re.match('Election of', s) or re.match('Swearing[ -]in Ceremony', s):
         pass
-    elif re.search('Youth$|^Chairmen|^Permanent Representative|^Executive Secretaries|Board members|Permanent Representatives|Envoys|Team$|^Honou?rable|Interns', s) and not re.search('(concert|luncheon|breakfast)(?i)', s):
+    elif re.search('Youth$|^Chairmen|^Permanent Representative|^Executive Secretaries|Board members|^Permanent Representatives|Envoys|Team$|^Honou?rable|Interns|Order|Board of Trustees|Members|Journalists', s) and not re.search('(concert|luncheon|breakfast)(?i)', s):
         s = 'Meeting the %s' % s
-    elif re.match('President|Association of|Vuk|Prince|Major-General|His Excellency|His Eminence|His Holiness|His Majesty|Ambassador|HE|H\.R\.H|H\.M\.|H\.H\.|H\.E\.|S\.E\.|Rev\.|Sir|General (?!Assembly)|H\.S\.H|Mr\.|Mrs\.|Prof\.|Dr\.|Professor|Ms\.|Amb\.?|Mayor|Messrs\.|Senator|(The )?R(igh)?t\.? Hon(ou?rable)?\.?|Hon\.|U\.S\. House|U\.S\. Senator|US Congressman|Judge|Archbishop|The Honorable|Rabbi|Lt\.|Major General|Excelent', s) and not re.search('luncheon(?i)', s):
+    elif re.match('- Mr|President|Association of|Vuk|Prince|Major-General|His Excellency|His Eminence|His Holiness|His Majesty|Ambassador|HE|H\.R\.H|H\.M\.|H\.H\.|H\.E\.|H\. E\.|S\.E\.|S\. E\.|Rev\.|Sir|General (?!Assembly)|H\.S\.H|Mr\.|Mrs\.|Prof\.|Dr\.|Professor|Ms\.|Amb\.?|Mayor|Messrs\.|Senator|(The )?R(igh)?t\.? Hon(ou?rable)?\.?|The Hon\.|Hon\.|U\.S\. House|U\.S\. Senator|US Congressman|Judge|Archbishop|The Honorable|Rabbi|Lt\.|Major General|Excelent|Metropolitan|Psy', s) and not re.search('luncheon(?i)', s):
         s = re.sub('Amb\.', 'Ambassador', s)
         s = re.sub('^Amb ', 'Ambassador ', s)
         s = 'Meeting %s' % s
-    elif re.search('Secretary-General of the League|Senior Adviser|Special Adviser|Permanent Representative|Special Representative|Minister of|Secretary of State for|Administrator|CEO|National Adviser|Ambassador|students', s) and not re.search('(concert|luncheon|breakfast|hosted by)(?i)', s):
+    elif re.search('Secretary-General of the League|Senior Adviser|Special Adviser|Permanent Representative|Minister of|Secretary of State for|Administrator|CEO|National Adviser|Ambassador|students', s) and not re.search('(concert|luncheon|breakfast|hosted by)(?i)', s):
         s = 'Meeting %s' % s
     elif re.match('The ', s):
         s = re.sub('^The ', 'Attending the ', s)
