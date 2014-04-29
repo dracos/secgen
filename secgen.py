@@ -190,7 +190,7 @@ def prettify(s):
         s = 'Meeting %s' % s
     elif re.search('Delegation|Members', s) and not re.search('(Group Meeting|concert|luncheon|breakfast)(?i)', s):
         s = 'Meeting the %s' % s
-    elif re.search('Secretary-General of the League|Senior Adviser|Special Adviser|Permanent Representative|Minister of|Secretary of State for|Administrator|CEO|National Adviser|Ambassador|students|Students', s) and not re.search('(concert|luncheon|breakfast|hosted by)(?i)', s):
+    elif re.search('Secretary-General of the League|Senior Adviser|Special Adviser|Permanent Representative|Minister of|Secretary of State for|Administrator|CEO|National Adviser|Ambassador|students|Students', s) and not re.search('(concert|luncheon|breakfast|hosted by|hand-over)(?i)', s):
         s = 'Meeting %s' % s
     elif re.match('The ', s):
         s = re.sub('^The ', 'Attending the ', s)
