@@ -20,7 +20,7 @@ from config import *
 
 localfile = '/guest/matthew/data/secgen-schedule'
 
-REGEX_TIME = re.compile('((\d+)(?:(?::|\.)\s*(\d+)|\s+(a\.?m\.?|p\.?m\.?|noon))+\.?)')
+REGEX_TIME = re.compile('(\*?(\d+)(?:(?::|\.)\s*(\d+)|\s+(a\.?m\.?|p\.?m\.?|noon))+\.?)')
 
 def main():
     p = argparse.ArgumentParser(description="UN Secretary-General > Twitter v1.0")
@@ -190,7 +190,7 @@ def prettify(s):
         return re.sub('\[Remarks at\] ', 'Making remarks at ', s)
     if re.search('Presentation of credential(?i)', s) or re.match('Remarks at', s) or re.match('Election of', s) or re.match('Swearing[ -]in Ceremony', s):
         pass
-    elif re.search('(?<!on )Youth$|^Group of Friends|^Leaders|^Chairmen|^Permanent Representatives?|^Executive Secretaries|Board members|Contact Group|Envoys|Team$|^Honou?rable|Interns|Order|Board of Trustees|Journalists|Committee$|Fellows$', s) and not re.search('(concert|luncheon|breakfast|event)(?i)', s) and not re.match('Meeting of', s):
+    elif re.search('(?<!on )Youth$|^Group of Friends|^Leaders|^Chairmen|^Permanent Representatives?|^Executive Secretaries|Board members|Contact Group|Envoys|Team$|^Honou?rable|Interns|Order|Board of Trustees|Journalists|Committee$|Fellows$|^Youth Delegates', s) and not re.search('(concert|luncheon|breakfast|event)(?i)', s) and not re.match('Meeting of', s):
         s = 'Meeting the %s' % s
     elif re.match('- Mr|His Royal Highness|President|Association of|Vuk|Queen|Prince|Major-General|His Excellency|His Eminence|His Holiness|His Majesty|Her Majesty|Ambassador|H\.?R\.?H|H\. ?M\.|H\. ?H\.|H\.? ?E\.?|S\. ?E\.|Rev\.|Sir|General (?!Assembly)|H\.S\.H|Mr\.|Mrs\.|Prof\.|Dr\.?|Lady|Justice|Professor|Ms\.?|Amb\.?|Mayor|Messrs\.|Senator|(The )?R(igh)?t\.? Hon(ou?rable)?\.?|The Hon\.|Hon\.|U\.S\. House|U\.S\. Senator|US Congressman|Judge|Archbishop|The Honou?rable|Rabbi|Lt\.|Major General|Excelent|Metropolitan|Psy|Thura|Lang Lang|Bahey|Antti', s) and not re.search('luncheon(?i)', s):
         s = re.sub('Amb\.', 'Ambassador', s)
