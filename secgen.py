@@ -20,7 +20,7 @@ from config import *
 
 localfile = '/guest/matthew/data/secgen-schedule'
 
-REGEX_TIME = re.compile('(\*?(\d+)(?:(?::|\.)\s*(\d+)|\s+(a\.?m\.?|p\.?m\.?|noon))+\.?)')
+REGEX_TIME = re.compile('(\*?(\d+)(?:(?::|\.)\s*(\d+)|\s+(a\.?m\.?|p\.?m\.?|noon))+\.?\s*\*?)')
 
 def main():
     p = argparse.ArgumentParser(description="UN Secretary-General > Twitter v1.0")
@@ -132,11 +132,11 @@ def parsetime(time, date, pastnoon):
     min = int(min)
     if not pm and pastnoon:
         hour += 12
-    if pm in ('pm', 'p.m.') and hour != 12:
+    if pm in ('pm', 'p.m', 'p.m.') and hour != 12:
         hour += 12
-    if pm in ('am', 'a.m.') and hour == 12:
+    if pm in ('am', 'a.m', 'a.m.') and hour == 12:
         hour -= 12
-    if pm in ('pm', 'p.m.', 'noon'):
+    if pm in ('pm', 'p.m', 'p.m.', 'noon'):
         pastnoon = True
     d = datetime(date.tm_year, date.tm_mon, date.tm_mday, hour, min)
     d += timedelta(hours=5) # Assume we're in New York, and BST is same (which it isn't)
