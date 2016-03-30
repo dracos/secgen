@@ -6,6 +6,9 @@
 # Copyright (c) 2007 Matthew Somerville.
 # http://www.dracos.co.uk/
 
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()
+
 import argparse
 import os
 import re
