@@ -111,6 +111,7 @@ def twitter(s):
         wrapped = [ s ]
     resp = ''
     first = True
+    in_reply_to_status_id = None
     for line in wrapped:
         if resp:
             sleep(5)
@@ -118,7 +119,9 @@ def twitter(s):
             line = u"%s\u2026" % line
         if not first:
             line = u"\u2026%s" % line
-        resp += api.update_status(line).text
+        update = api.update_status(line, in_reply_to_status_id)
+        in_reply_to_status_id = update.id
+        resp += update.text
         first = False
     return resp
 
