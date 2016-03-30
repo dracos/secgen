@@ -71,12 +71,13 @@ def fetch():
 def parse(warn=0):
     try:
         d = get_contents("%s-override" % localfile)
-    except:
-        d = get_contents(localfile)
-    if re.search('Proxy Error', d) or re.search('website is undergoing urgent maintenance', d):
-        if warn:
-            print 'Have downloaded a proxy error...'
-        return []
+    except IOError:
+        try:
+            d = get_contents(localfile)
+        except IOError:
+            if warn:
+                print 'No downloaded schedule'
+            return []
     soup = BeautifulSoup(d, smartQuotesTo=None)
     table = soup.find('div', id='content')
     events = []
