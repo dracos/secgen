@@ -53,7 +53,7 @@ def fetch():
         current = get_contents(localfile)
     except:
         pass
-    if current != new and not re.search('Not Found|Service Temporarily Unavailable|HTTP Error 50[17]|SQLState(?i)', new):
+    if current != new and not re.search('Proxy Error|urgent maintenance|Not Found|Service Temporarily Unavailable|Internal server error|HTTP Error 50[17]|SQLState(?i)', new):
         f = open(localfile, 'w')
         f.write(new)
         f.close()
