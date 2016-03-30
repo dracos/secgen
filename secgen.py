@@ -87,7 +87,7 @@ def parse(warn=0):
         row = parsecell(row.renderContents().decode('utf-8'))
         m = REGEX_TIME.match(row)
         if not m:
-            if row[0:2] == '- ':
+            if row[0:2] in ('- ', 'Mr') or row[0:4] == 'Amb.':
                 event = parsecell(row, True)
                 last = events[-1]
                 events[-1] = ( last[0], '%s %s' % (last[1], event) )
