@@ -139,7 +139,7 @@ def parsetime(time, date, pastnoon):
     min = int(min)
     if not pm and pastnoon:
         hour += 12
-    if pm in ('pm', 'p.m', 'p.m.') and hour != 12:
+    if pm in ('pm', 'p.m', 'p.m.') and hour < 12:
         hour += 12
     if pm in ('am', 'a.m', 'a.m.') and hour == 12:
         hour -= 12
