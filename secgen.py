@@ -50,7 +50,7 @@ def test():
         print time, event.encode('utf-8')
 
 def fetch():
-    new = get_contents('http://www.un.org/sg/sg_schedule.asp')
+    new = get_contents('https://www.un.org/sg/en/content/sg/appointments-secretary-general')
     current = ''
     try:
         current = get_contents(localfile)
@@ -79,10 +79,10 @@ def parse(warn=0):
                 print 'No downloaded schedule'
             return []
     soup = BeautifulSoup(d, smartQuotesTo=None)
-    table = soup.find('div', id='content')
+    table = soup.find('div', 'view-schedules')
     events = []
     pastnoon = False
-    date = strptime(table.find('b').renderContents(), '%A, %d %B %Y')
+    date = strptime(table.find('span', 'date-display-single')['content'], '%Y-%m-%dT%H:%M:%S-04:00')
     for row in table('tr'):
         row = parsecell(row.renderContents().decode('utf-8'))
         m = REGEX_TIME.match(row)
@@ -232,7 +232,7 @@ def parsecell(s, d=False):
     return s
 
 def get_contents(s):
-    if 'http://' in s:
+    if 'http://' in s or 'https://' in s:
         f = urllib.urlopen(s)
     else:
         f = open(s)
