@@ -49,6 +49,12 @@ def test():
     for time, event in parse(warn=1):
         print time, event.encode('utf-8')
 
+def remove_changing_bits(s):
+    return re.sub('^.*?view-content(?s)', '', s)
+
+def diff(a, b):
+    return remove_changing_bits(a) != remove_changing_bits(b)
+
 def fetch():
     new = get_contents('https://www.un.org/sg/en/content/sg/appointments-secretary-general')
     current = ''
@@ -56,7 +62,7 @@ def fetch():
         current = get_contents(localfile)
     except:
         pass
-    if current != new and not re.search('Proxy Error|urgent maintenance|Not Found|Service Temporarily Unavailable|Internal server error|HTTP Error 50[17]|SQLState(?i)', new):
+    if diff(current, new) and not re.search('Proxy Error|urgent maintenance|Not Found|Service Temporarily Unavailable|Internal server error|HTTP Error 50[17]|SQLState(?i)', new):
         f = open(localfile, 'w')
         f.write(new)
         f.close()
