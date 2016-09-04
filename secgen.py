@@ -228,6 +228,7 @@ def prettify(s):
 
 def parsecell(s, d=False):
     s = re.sub('\xc2\xa0', ' ', s)
+    s = re.sub(u'\xa0', ' ', s)
     if d:
         s = re.sub("<br />", ", ", s)
         s = re.sub("</p>", " ", s)
