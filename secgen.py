@@ -34,7 +34,7 @@ def main():
 
     if options.action == 'fetch':
         if fetch():
-            test()
+            test(fetched=1)
     elif options.action == 'twitter':
         now = datetime.today()
         for time, event in parse():
@@ -45,8 +45,11 @@ def main():
     else:
         p.print_help()
 
-def test():
+def test(fetched=0):
     for time, event in parse(warn=1):
+        if fetched:
+            print "New schedule downloaded"
+            fetched = 0
         print time, event.encode('utf-8')
 
 def remove_changing_bits(s):
@@ -70,7 +73,6 @@ def fetch():
             os.remove('%s-override' % localfile)
         except:
             pass
-        print "New schedule downloaded"
         return True
     return False
 
