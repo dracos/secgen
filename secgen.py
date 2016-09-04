@@ -15,7 +15,7 @@ import re
 import textwrap
 import urllib
 import htmlentitydefs
-from datetime import datetime, timedelta
+import arrow
 from time import strptime, sleep
 from BeautifulSoup import BeautifulSoup
 import tweepy
@@ -36,9 +36,9 @@ def main():
         if fetch():
             test(fetched=1)
     elif options.action == 'twitter':
-        now = datetime.today()
+        now = arrow.utcnow()
         for time, event in parse():
-            if now>=time and now<time+timedelta(minutes=5):
+            if now >= time and now < time.replace(minutes=5):
                 twitter(event)
     elif options.action == 'test':
         test()
@@ -153,8 +153,7 @@ def parsetime(time, date, pastnoon):
         hour -= 12
     if pm in ('pm', 'p.m', 'p.m.', 'noon'):
         pastnoon = True
-    d = datetime(date.tm_year, date.tm_mon, date.tm_mday, hour, min)
-    d += timedelta(hours=5) # Assume we're in New York, and BST is same (which it isn't)
+    d = arrow.get(date.tm_year, date.tm_mon, date.tm_mday, hour, min, tzinfo='America/New_York')
     return d, pastnoon
 
 def prettify(s):
