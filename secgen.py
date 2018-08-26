@@ -16,14 +16,14 @@ import textwrap
 import urllib
 import htmlentitydefs
 import arrow
-from time import strptime, sleep
+from time import sleep
 from BeautifulSoup import BeautifulSoup
 import tweepy
 from config import *
 
 localfile = '/guest/matthew/data/secgen-schedule'
 
-REGEX_TIME = re.compile('(\*?(\d+)(?:(?::|\.)\s*(\d+)|\s+(a\.?m\.?|p\.?m\.?|noon))+\.?\s*\*?)')
+REGEX_TIME = re.compile('(\*?(\d+)(?:(?::|\.)\s*(\d+)|\s*(a\.?m\.?|p\.?m\.?|noon))+\.?\s*\*?)')
 
 def main():
     p = argparse.ArgumentParser(description="UN Secretary-General > Twitter v1.0")
@@ -90,7 +90,7 @@ def parse(warn=0):
     table = soup.find('div', 'view-schedules')
     events = []
     pastnoon = False
-    date = strptime(table.find('span', 'date-display-single')['content'], '%Y-%m-%dT%H:%M:%S-04:00')
+    date = arrow.get(table.find('span', 'date-display-single')['content'], 'YYYY-MM-DDTHH:mm:ssZZ')
     for row in table('tr'):
         row = parsecell(row.renderContents().decode('utf-8'))
         m = REGEX_TIME.match(row)
@@ -139,6 +139,8 @@ def parsetime(time, date, pastnoon):
         (dummy, hour, min, pm) = m.groups()
         if min == None:
             min = 0
+        if len(hour) == 3:
+            hour, min = hour[0], hour[1:]
     elif time == 'noon':
         hour = 12
         min = 0
@@ -153,7 +155,7 @@ def parsetime(time, date, pastnoon):
         hour -= 12
     if pm in ('pm', 'p.m', 'p.m.', 'noon'):
         pastnoon = True
-    d = arrow.get(date.tm_year, date.tm_mon, date.tm_mday, hour, min, tzinfo='America/New_York')
+    d = date.replace(hour=hour, minute=min)
     return d, pastnoon
 
 def prettify(s):
