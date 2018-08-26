@@ -159,7 +159,17 @@ def parsetime(time, date, pastnoon):
     d = date.replace(hour=hour, minute=min)
     return d, pastnoon
 
+def titlecaseifuppercase(s):
+    if re.match('[A-Z]+$', s) and len(s)>2:
+        return s.title()
+    if s == 'OF':
+        return 'of'
+    return s
+
 def prettify(s):
+    s = re.sub('^approx\. ', '', s)
+    s = ''.join(map(titlecaseifuppercase, re.split('([() ])', s)))
+    s = s.replace('Secretery', 'Secretary') # !
     if re.match('Addressing|Meeting (with|on)|Visiting|Visit to|Trilateral Meeting', s) and not re.search('Secretary-General (will|to) make remarks', s):
         return s
     if re.match('Chairing of the ', s):
@@ -178,6 +188,8 @@ def prettify(s):
         return re.sub('(.*?) hosted by the Secretary-General ', r'Hosting \1 ', s)
     if re.match('Secretary-General to host ', s):
         return re.sub('Secretary-General to host ', 'Hosting ', s)
+    if re.match('The Secretary-General departs ', s):
+        return re.sub('The Secretary-General departs ', 'Departing ', s)
     if re.match('Secretary-General to brief ', s):
         return re.sub('Secretary-General to brief ', 'Briefing ', s)
     if re.search('to hear a briefing by the Secretary-General', s):
@@ -198,27 +210,29 @@ def prettify(s):
         return re.sub('Secretary-General will hold ', 'Holding ', s)
     if re.match('Secretary-General to give ', s):
         return re.sub('Secretary-General to give ', 'Giving ', s)
+    if re.match('Drop by at ', s):
+        return re.sub('Drop by at ', 'Dropping by ', s)
     if re.match('Remarks by the Secretary-General |SG remarks at|Secretary(-| )General\'?s? (to (make|give) )?remarks |Welcoming Remarks ', s):
         return re.sub('Remarks by the Secretary-General |SG remarks |Secretary(-| )General\'?s? (to (make|give) )?remarks |Welcoming Remarks ', 'Making remarks ', s)
-    m = re.search(' (?:.\200\223 |- |\[|{|\()Secretary-General (?:to|will) make ([Oo]pening |closing )?[rR]emarm?ks(\]|}|\))?\.?$', s)
+    m = re.search(' (?:.\200\223 |- |\[|{|\()(?:The )?Secretary-General (?:to|will) (?:make|deliver) ([Oo]pening |closing )?[rR]emarm?ks(\]|}|\))?\.?$', s)
     if m:
         new = 'Making %sremarks at ' % (m.group(1) or '').lower()
         s = re.sub('^Addressing ', '', s)
         if not re.match('The (?i)', s): new += 'the '
-        return re.sub('^(.*) (?:.\200\223 |- |\[|{|\()Secretary-General (?:to|will) make ([Oo]pening |closing )?[rR]emarm?ks(\]|}|\))?', new + r'\1', s)
+        return re.sub('^(.*) (?:.\200\223 |- |\[|{|\()(?:The )?Secretary-General (?:to|will) (?:make|deliver) ([Oo]pening |closing )?[rR]emarm?ks(\]|}|\))?', new + r'\1', s)
     if re.match('\[Remarks at\] ', s):
         return re.sub('\[Remarks at\] ', 'Making remarks at ', s)
     if re.search('Presentation of credential(?i)', s) or re.match('Remarks at', s) or re.match('Election of', s) or re.match('Swearing[ -]in Ceremony', s):
         pass
-    elif re.search('(?<!on )Youth$|^Group of Friends|^Leaders|^Chairmen|^Permanent Representatives?|^Executive Secretaries|Board members|Contact Group|Envoys|Team$|^Honou?rable|Interns|Order|Board of Trustees|Journalists|Committee$|Fellows$|^(UN )?Youth Delegates', s) and not re.search('(president|photo opportunity|concert|luncheon|breakfast|event)(?i)', s) and not re.match('Meeting of|Joint meeting', s):
+    elif re.search('(?<!on )Youth$|^Sages Group|Messengers$|^Group of Friends|^Leaders|^Chairmen|^Permanent Representatives?|^Executive Secretaries|Board members|Contact Group|Envoys|Team$|^Honou?rable|Interns|Order|Board of Trustees|Journalists$|Committee( of the .*Parliament)$|Fellows$|^(UN )?Youth Delegates', s) and not re.search('(president|photo opportunity|concert|luncheon|breakfast|event)(?i)', s) and not re.match('Meeting of|Joint meeting|Mr', s):
         s = 'Meeting the %s' % s
-    elif re.match('- Mr|His (Royal|Serene) Highness|President|Association of|Vuk|Queen|Prince|Major-General|His Excellency|His Eminence|His Holiness|His Majesty|Her Majesty|Ambassador|H\.?R\.?H|H\. ?M\.|H\. ?H\.|H\.? ?E\.?|S\. ?E\.|Rev\.|The Very Rev|Sir|General (?!Assembly)|H\.S\.H|\.?Mr\.?|Mrs\.|Prof\.|Dr\.?|Lord|Lady|Justice|Professor|Ms\.?|Amb\.?|Mayor|Messrs\.|Senator|(The )?R(igh)?t\.? Hon(ou?rable)?\.?|The Hon\.|Hon\.|U\.S\. House|U\.S\. Senator|US Congressman|Judge|Cardinal|Archbishop|The Honou?rable|Rabbi|Lt\.|Major General|Lieutenant|Excelent|Metropolitan|Psy|Thura|Lang Lang|Bahey|Antti|Bishop|Pastor|Shaykh|Srgjan|Michel', s) and not re.search('luncheon(?i)', s):
+    elif re.match(r'- Mr|His (Royal|Serene) Highness|President|Association of|Vuk|Queen|Prince|Major-General|His Excellency|His Eminence|His Holiness|His Majesty|Her Majesty|Their Majesties|Ambassador\b|H\.?R\.?H|H\. ?M\.|H\. ?H\.|H\.? ?E\.?|S\. ?E\.|Rev\.|The Very Rev|Sir|General (?!Assembly)|H\.S\.H|\.?Mr\.?|Mrs\.|Prof\.|Dr\.?\b|Lord|Lady|Justice|Professor|Ms\.?|Amb\.?\b|Mayor|Messrs\.|Senator|(The )?R(igh)?t\.? Hon(ou?rable)?\.?|The Hon\.|Hon\.|U\.S\. House|U\.S\. Senator|US Congressman|Judge|Cardinal|Archbishop|The Honou?rable|Rabbi|Lt\.|Major General|Lieutenant|Excelent|Metropolitan|Psy|Thura|Lang Lang|Bahey|Antti|Bishop|Pastor|Shaykh|Srgjan|Michel|Commissioner', s) and not re.search('luncheon(?i)', s):
         s = re.sub('Amb\.', 'Ambassador', s)
         s = re.sub('^Amb ', 'Ambassador ', s)
         if re.match('The ', s):
             s = re.sub('^The', 'the', s)
         s = 'Meeting %s' % s
-    elif re.search('Delegation|Members(?i)', s) and not re.search('(Joint Meeting|Group Meeting|concert|luncheon|breakfast)(?i)', s):
+    elif re.search('Delegation|Members(?i)', s) and not re.search('(Joint.*Meeting|Group Meeting|concert|luncheon|breakfast)(?i)', s):
         s = 'Meeting the %s' % s
     elif re.search(r'Elder|High Representative|Chairman\b|Secretary-General of the League|Senior Adviser|Special Adviser|Special Representative|Permanent Representative|Minister of|Secretary of State for|Administrator|CEO|National Adviser|Ambassador|students|Students', s) and not re.search('(concert|conversation|luncheon|breakfast|hosted by|hand-over|meeting|conference)(?i)', s):
         s = 'Meeting %s' % s
@@ -229,6 +243,7 @@ def prettify(s):
     return s
 
 def parsecell(s, d=False):
+    s = re.sub('^REV.1 ', '', s)
     s = re.sub('\xc2\xa0', ' ', s)
     s = re.sub(u'\xa0', ' ', s)
     if d:
