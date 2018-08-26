@@ -6,14 +6,11 @@
 # Copyright (c) 2007 Matthew Somerville.
 # http://www.dracos.co.uk/
 
-import requests.packages.urllib3
-requests.packages.urllib3.disable_warnings()
-
 import argparse
 import os
 import re
 import textwrap
-import urllib
+import requests
 import htmlentitydefs
 import arrow
 from time import sleep
@@ -60,6 +57,8 @@ def diff(a, b):
 
 def fetch():
     new = get_contents('https://www.un.org/sg/en/content/sg/appointments-secretary-general')
+    if not new:
+        return False
     current = ''
     try:
         current = get_contents(localfile)
@@ -88,6 +87,8 @@ def parse(warn=0):
             return []
     soup = BeautifulSoup(d, smartQuotesTo=None)
     table = soup.find('div', 'view-schedules')
+    if not table:
+        return []
     events = []
     pastnoon = False
     date = arrow.get(table.find('span', 'date-display-single')['content'], 'YYYY-MM-DDTHH:mm:ssZZ')
@@ -243,11 +244,13 @@ def parsecell(s, d=False):
 
 def get_contents(s):
     if 'http://' in s or 'https://' in s:
-        f = urllib.urlopen(s)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'}
+        try:
+            o = requests.get(s, headers=headers).content
+        except requests.exceptions.ConnectionError:
+            o = ''
     else:
-        f = open(s)
-    o = f.read()
-    f.close()
+        o = open(s).read()
     return o
 
 def unescape(text):
