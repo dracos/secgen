@@ -114,8 +114,8 @@ def twitter(s):
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     api = tweepy.API(auth)
 
-    if len(s)>140:
-        wrapped = textwrap.wrap(s, 139)
+    if len(s)>280:
+        wrapped = textwrap.wrap(s, 280-2)
     else:
         wrapped = [ s ]
     resp = ''
