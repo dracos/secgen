@@ -1,4 +1,4 @@
 secgen
 ======
 
-Unofficial Twitter bot of the UN Secretary-General
+This project has been subsumed into https://github.com/dracos/scheduler
